@@ -16,6 +16,10 @@ urlpatterns = [
     url(r'^investment/(?P<pk>\d+)/delete/$', views.investment_delete, name='investment_delete'),
     url(r'^investment/(?P<pk>\d+)/edit/$', views.investment_edit, name='investment_edit'),
     url(r'^investment/create/$', views.investment_new, name='investment_new'),
+    url(r'^fund/$', views.fund_list, name='fund_list'),
+    url(r'^fund/(?P<pk>\d+)/delete/$', views.fund_delete, name='fund_delete'),
+    url(r'^fund/(?P<pk>\d+)/edit/$', views.fund_edit, name='fund_edit'),
+    url(r'^fund/create/$', views.fund_new, name='fund_new'),
     url(r'^accounts/profile/$', views.home, name='home'),
 
 ]

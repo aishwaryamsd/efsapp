@@ -143,14 +143,60 @@ def investment_delete(request, pk):
     return render(request, 'portfolio/investment_list.html', {'investments': investments})
 
 @login_required
+def fund_list(request):
+   funds = Fund.objects.filter(purchase_date__lte=timezone.now())
+   return render(request, 'portfolio/fund_list.html', {'funds': funds})
+
+@login_required
+def fund_new(request):
+   if request.method == "POST":
+       form = FundForm(request.POST)
+       if form.is_valid():
+           fund = form.save(commit=False)
+           fund.created_date = timezone.now()
+           fund.save()
+           funds = Fund.objects.filter(purchase_date__lte=timezone.now())
+           return render(request, 'portfolio/fund_list.html',
+                         {'funds': funds})
+   else:
+       form = FundForm()
+       # print("Else")
+   return render(request, 'portfolio/fund_new.html', {'form': form})
+
+@login_required
+def fund_edit(request, pk):
+    fund = get_object_or_404(Fund, pk=pk)
+    if request.method == "POST":
+        form = FundForm(request.POST, instance=fund)
+        if form.is_valid():
+            fund = form.save()
+            # fund.customer = fund.id
+            fund.updated_date = timezone.now()
+            fund.save()
+            funds = Fund.objects.filter(purchase_date__lte=timezone.now())
+            return render(request, 'portfolio/fund_list.html', {'funds': funds})
+    else:
+        # print("else")
+        form = FundForm(instance=fund)
+    return render(request, 'portfolio/fund_edit.html', {'form': form})
+
+@login_required
+def fund_delete(request, pk):
+    fund = get_object_or_404(Fund, pk=pk)
+    fund.delete()
+    funds = Fund.objects.filter(purchase_date__lte=timezone.now())
+    return render(request, 'portfolio/fund_list.html', {'funds': funds})
+
+@login_required
 def portfolio(request,pk):
    customer = get_object_or_404(Customer, pk=pk)
    customers = Customer.objects.filter(created_date__lte=timezone.now())
-   investments =Investment.objects.filter(customer=pk)
+   investments = Investment.objects.filter(customer=pk)
    stocks = Stock.objects.filter(customer=pk)
+   funds = Fund.objects.filter(customer=pk)
    sum_acquired_value = Investment.objects.filter(customer=pk).aggregate(Sum('acquired_value'))
 
 
    return render(request, 'portfolio/portfolio.html', {'customers': customers, 'investments': investments,
-                                                      'stocks': stocks,
+                                                      'stocks': stocks, 'funds': funds,
                                                       'sum_acquired_value': sum_acquired_value,})
